@@ -23,8 +23,7 @@ try {
   resource_type:'auto'
  });
  
- console.log("file has been uploaded on the cloudeniary",response)
-    
+ fs.unlinkSync(filePath);   
  return response.url;
 
 } catch (error) {

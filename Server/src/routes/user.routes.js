@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { registration } from "../controllers/user.controller.js";
+import { signupUser } from "../controllers/user.controller.js";
+import upload from "../middleware/multer.middleware.js";
 const userRoute=Router();
 
-userRoute.route('/registration').get(registration)
+userRoute.route('/signup').post(upload.fields([{
+name: "avatar" , maxCount:1
+}]), signupUser)
 
 
 
