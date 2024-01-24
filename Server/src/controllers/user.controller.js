@@ -1,9 +1,8 @@
 import User from "../models/user.model.js"
 import uploadOnCloud from "../utils/cloudineary.js";
 
-
+//controller for registering the user
 export const signupUser= async function(req,res){
-
 
 try {
     
@@ -77,4 +76,46 @@ if(userCreate){
         error 
     }) 
 } 
+}
+
+
+// controller for login functionality
+
+export const userLogin= async function(req,res){
+
+try {
+    const{password,email}=req.body;
+ 
+    if(!password||!email){
+    return res.status(404).json({
+        msg:"all the fields are not filled"
+    })}
+
+    // check wheter user is presente or not 
+    const isUserExist=await User.findOne({email});
+ 
+    if(!isUserExist){
+        return res.status(404).json({
+            msg:"User is not exist"
+        })
+    }
+  const isPasswordRight= await User.isPasswordCorrect(password);
+   
+  if (!isPasswordRight) {
+    return res.status(401).json({
+        msg: "Incorrect password"
+    });
+}
+ console.log(isPasswordRight)
+return res.status(200).json({
+    msg:"user is loged in "
+}) 
+
+} catch (error) {
+   console.log("Login failed",error)
+   return res.status(400).json({
+    msg:"User login is  failed",
+    error
+   }) 
+}
 }
