@@ -99,6 +99,9 @@ try {
             msg:"User is not exist"
         })
     }
+   
+    
+
   const isPasswordRight= await User.isPasswordCorrect(password);
    
   if (!isPasswordRight) {
