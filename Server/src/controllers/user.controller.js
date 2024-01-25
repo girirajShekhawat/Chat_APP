@@ -1,6 +1,33 @@
 import User from "../models/user.model.js"
 import uploadOnCloud from "../utils/cloudineary.js";
 
+
+const generateAccessAndRefreshToken= async function(userId){
+    
+       try {
+        const user=await User.findById({userId});
+        if(!user){
+         return res.status(400).json({
+             msg:"Error in Token generation"
+          })
+        }
+     const accessToken=await user.generateAccessToken();
+     const refreshToken=await user.generateRefreshToken();
+    // now save the refresh token in the db
+
+      user.refreshToken=refreshToken;
+      await user.save({validateBeforeSave:false});
+
+      return{refreshToken,accessToken}
+
+       } catch (error) {
+        console.log(error)
+         res.status(500).json({
+            msg:"something went wrong in token generation"
+         })
+       }
+  }
+
 //controller for registering the user
 export const signupUser= async function(req,res){
 
@@ -31,9 +58,10 @@ try {
  
    // checking whether img file is uploaded or not
    let avatarUrl;
-   const avatarObj=Object.keys(req.files).length
+   
  
-   if(avatarObj){
+   if(req.files && Array.isArray(req.files.avatar) && req.files.avatar.length>0){
+
    const filePath=req.files?.avatar[0]?.path;
 
    // if(!filePath){
@@ -84,34 +112,58 @@ if(userCreate){
 export const userLogin= async function(req,res){
 
 try {
-    const{password,email}=req.body;
+    const{password,email,username}=req.body;
+
+    if(!username && !email){
+        return res.status(404).json({
+            msg:"username or email required"
+        })}
  
-    if(!password||!email){
+    if(!password){
     return res.status(404).json({
         msg:"all the fields are not filled"
     })}
 
     // check wheter user is presente or not 
-    const isUserExist=await User.findOne({email});
+    const user=await User.findOne({
+        $or:[{email},{username}]
+    });
  
-    if(!isUserExist){
+    if(!user){
         return res.status(404).json({
             msg:"User is not exist"
         })
     }
    
-    
-
-  const isPasswordRight= await User.isPasswordCorrect(password);
+  const isPasswordValid= await user.isPasswordCorrect(password);
    
-  if (!isPasswordRight) {
-    return res.status(401).json({
+    if (!isPasswordValid) {
+        return res.status(401).json({
         msg: "Incorrect password"
-    });
-}
- console.log(isPasswordRight)
-return res.status(200).json({
-    msg:"user is loged in "
+       });
+        }
+
+  const{refreshToken,accessToken} = await generateAccessAndRefreshToken(user._id);
+  
+//   setting up the password and refresh token empty before sending the data in response
+    user.refreshToken="";   
+    user.password="";
+
+// setting up the option field for the cookies
+  const options={
+    httpOnly:true,
+    secure:true,
+  }
+ 
+return res.status(200)
+.cookie("accessToken",accessToken,options)
+.cookie("refreshToken",refreshToken,options)
+.json({
+    msg:"user loged in successfully",
+    data:{
+        user,accessToken,refreshToken  // we are sending tokens explisitly because if user want to store token in local storage
+    },
+
 }) 
 
 } catch (error) {
