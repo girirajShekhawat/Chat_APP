@@ -163,9 +163,7 @@ return res.status(200)
     data:{
         user,accessToken,refreshToken  // we are sending tokens explisitly because if user want to store token in local storage
     },
-
 }) 
-
 } catch (error) {
    console.log("Login failed",error)
    return res.status(400).json({
@@ -173,4 +171,37 @@ return res.status(200)
     error
    }) 
 }
+}
+
+// for the user logout 
+
+export const userLogout= async function(req,res){
+  
+   try {
+     await User.findByIdAndUpdate(
+         req.user._id,
+         {
+             refreshToken:undefined,
+         },
+         {
+             new:true,
+         })
+
+    const options={
+        httpOnly:true,
+        secure:true,
+      }
+
+      res.status(200)
+      .clearCookie("accessToken",accessToken,options)
+      .clearCookie("refreshToken",refreshToken,options)
+      .json({
+        msg:"user logout successfully"
+      })
+
+   } catch (error) {
+    
+   }
+ 
+
 }
