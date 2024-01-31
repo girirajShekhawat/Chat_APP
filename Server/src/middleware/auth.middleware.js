@@ -7,13 +7,14 @@ export const verifyJwt=async function(req,res,next){
         const token= req.cookies?.accessToken || req.header.
         Authorization ?.replace("Bearer ","")
           // ("Authorization")?.replace("Bearer ","")
-        
-        if(!token){
+
+                 if(!token){
             return res.status(401).json({
                 msg:"token is not present"
             })
         }
     // decode the token
+     
     const decodedToken=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
     const user=await User.findById(decodedToken?._id).select("-password -refreshToken");
     
@@ -27,7 +28,8 @@ export const verifyJwt=async function(req,res,next){
      next() 
     } catch (error) {
       return  res.status(500).json({
-            msg:"something went wrong at authentication"
+            msg:"something went wrong at authentication",
+             error:error.message
         })
     }  
 }

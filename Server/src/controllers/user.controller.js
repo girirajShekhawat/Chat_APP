@@ -180,10 +180,10 @@ return res.status(200)
 export const userLogout= async function(req,res){
   
    try {
-     await User.findByIdAndUpdate(
+   const response=  await User.findByIdAndUpdate(
          req.user._id,
          {
-             refreshToken:undefined,
+           $unset:{ refreshToken:1}  
          },
          {
              new:true,
@@ -194,9 +194,9 @@ export const userLogout= async function(req,res){
         secure:true,
       }
 
-      res.status(200)
-      .clearCookie("accessToken",accessToken,options)
-      .clearCookie("refreshToken",refreshToken,options)
+    return  res.status(200)
+      .clearCookie("accessToken", options)
+      .clearCookie("refreshToken",options)
       .json({
         msg:"user logout successfully"
       })
@@ -204,7 +204,7 @@ export const userLogout= async function(req,res){
    } catch (error) {
     return res.status(500).json({
         msg:"some thing went wrong",
-        error
+        error:error.message
        }) 
    }
  
