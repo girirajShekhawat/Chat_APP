@@ -15,4 +15,4 @@ userRouter.route("/logout").post(verifyJwt,userLogout)
 
 
 
-export default  userRoute;
+export default  userRouter;

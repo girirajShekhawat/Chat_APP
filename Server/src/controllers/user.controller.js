@@ -5,11 +5,12 @@ import uploadOnCloud from "../utils/cloudineary.js";
 const generateAccessAndRefreshToken= async function(userId){
     
        try {
-        const user=await User.findById({userId});
+        const user=await User.findById(userId);
         if(!user){
-         return res.status(400).json({
-             msg:"Error in Token generation"
-          })
+        //  return res.status(400).json({
+        //      msg:"Error in Token generation"
+        //   })
+        return 
         }
      const accessToken=await user.generateAccessToken();
      const refreshToken=await user.generateRefreshToken();
@@ -18,13 +19,14 @@ const generateAccessAndRefreshToken= async function(userId){
       user.refreshToken=refreshToken;
       await user.save({validateBeforeSave:false});
 
-      return{refreshToken,accessToken}
+      return{ accessToken,refreshToken}
 
        } catch (error) {
         console.log(error)
-         res.status(500).json({
-            msg:"something went wrong in token generation"
-         })
+    //   return   res.status(500).json({
+    //         msg:"something went wrong in token generation"
+    //      })
+    return
        }
   }
 
@@ -113,7 +115,7 @@ export const userLogin= async function(req,res){
 
 try {
     const{password,email,username}=req.body;
-
+  console.log(req.body)
     if(!username && !email){
         return res.status(404).json({
             msg:"username or email required"
@@ -121,7 +123,7 @@ try {
  
     if(!password){
     return res.status(404).json({
-        msg:"all the fields are not filled"
+        msg:"password is required"
     })}
 
     // check wheter user is presente or not 
@@ -166,8 +168,8 @@ return res.status(200)
 }) 
 } catch (error) {
    console.log("Login failed",error)
-   return res.status(400).json({
-    msg:"User login is  failed",
+   return res.status(500).json({
+    msg:"some thing went wrong",
     error
    }) 
 }
@@ -200,7 +202,10 @@ export const userLogout= async function(req,res){
       })
 
    } catch (error) {
-    
+    return res.status(500).json({
+        msg:"some thing went wrong",
+        error
+       }) 
    }
  
 
