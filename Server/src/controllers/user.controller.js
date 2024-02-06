@@ -109,7 +109,7 @@ if(userCreate){
 }
 
 
-// controller for login functionality
+//  for login controller
 
 export const userLogin= async function(req,res){
 
@@ -210,3 +210,9 @@ export const userLogout= async function(req,res){
  
 
 }
+
+ 
+
+
+
+ 
