@@ -207,9 +207,59 @@ export const userLogout= async function(req,res){
         error:error.message
        }) 
    }
- 
-
 }
+
+// password updated controller
+export const changePassword=async function (req,res){
+    try {
+        const{oldPassword,newPassword}=req.body;
+
+        if(!oldPassword || !newPassword){
+            return res.status(400).json({
+                msg:"password not found"
+            })
+        }
+    const user=await findById(req.user?._id);
+
+    const isPasswordCorrect=await user.isPasswordCorrect(oldPassword);
+
+    if(!isPasswordCorrect){
+        return res.status(400).json({
+             msg:"old password is not correct"
+        })
+    }
+
+    user.password=newPassword;
+      await user.save({validateBeforeSave:false});
+   
+      return res.status(200).json({
+                 msg:"password updation  successful",
+                 
+             })
+
+    } catch (error) {
+        return res.status(500).json({
+            msg:"some thing went wrong in password updation",
+            error:error.message
+        })
+    }
+}
+
+// fetching the current user
+export const getCurrentUser= async function(req,res){
+    try {
+        res.status(200).json({
+            user:req.user,
+            msg:"user fetching successfull"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            msg:"some thing went wrong user fetching",
+            error:error.message
+        })
+    }
+}
+
 
  
 
