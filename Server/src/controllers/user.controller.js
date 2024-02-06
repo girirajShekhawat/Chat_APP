@@ -23,9 +23,6 @@ const generateAccessAndRefreshToken= async function(userId){
 
        } catch (error) {
         console.log(error)
-    //   return   res.status(500).json({
-    //         msg:"something went wrong in token generation"
-    //      })
     return
        }
   }
@@ -219,7 +216,7 @@ export const changePassword=async function (req,res){
                 msg:"password not found"
             })
         }
-    const user=await findById(req.user?._id);
+    const user=await User.findById(req.user?._id);
 
     const isPasswordCorrect=await user.isPasswordCorrect(oldPassword);
 
@@ -255,6 +252,95 @@ export const getCurrentUser= async function(req,res){
     } catch (error) {
         return res.status(500).json({
             msg:"some thing went wrong user fetching",
+            error:error.message
+        })
+    }
+}
+
+// user datailes update
+export const userDetailsUpdate= async function(req,res){
+    try {
+         const {email,name}=req.body;
+
+         if(!email|| !name){
+            return res.status(400).json({
+                msg:"name or email is not found",
+            })
+         }
+
+   const user=await User.findByIdAndUpdate(
+            req.user?._id,
+            {
+                $set:{
+                    email,
+                    name
+                }
+            },
+            {
+                new:true
+            }
+         ).select("-password -refreshToken");
+
+        if(!user){
+            return res.status(400).json({
+                msg:"user datails updation failed",
+        })} 
+
+        return res.status(200).json({
+            msg:"user datails updated successfully",
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            msg:"some thing went wrong in user updation",
+            error:error.message
+        })
+    }
+}
+
+// updating the avatar image 
+
+export const updateAvatar= async function(req,res){
+    try {
+      const{avatarpath}=req.file?.path;
+    
+      if(!avatarpath){
+        return res.status(400).json({
+            msg:"avatar file is not present",
+        })
+      }
+
+  const avatarUrl= await uploadOnCloud(avatarpath);
+
+  if(!avatarUrl){
+    return res.status(400).json({
+        msg:"avatar file is not uploaded on the cloudineary",
+    })
+  }
+
+  const user=await User.findByIdAndUpdate(
+     req.user?._id,
+     {
+        $set:{
+            avatar:avatarUrl
+        }
+     },
+     {
+        new:true
+     }
+  ).select("-password -refreshToken");
+  
+  if(!user){
+    return res.status(400).json({
+        msg:" avatar updatedation failed ",
+})} 
+
+return res.status(200).json({
+    msg:"avatar updated successfully",
+})
+    } catch (error) {
+        return res.status(500).json({
+            msg:"some thing went wrong in avatar updation",
             error:error.message
         })
     }
