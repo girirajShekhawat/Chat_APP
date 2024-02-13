@@ -33,7 +33,7 @@ export const signupUser= async function(req,res){
 try {
     
     const{username,name,email,password,avatar}=req.body;
-    console.log(req.body,username)
+    console.log(req.body)
    // checking for all the fields availability
    if(!username||!name||!email||!password){
        return res.status(404).json({
@@ -92,15 +92,16 @@ if(userCreate){
    console.log(userCreate)
    return    res.status(200).json({
        msg:"user is get registered",
-       user:userCreate
+       data:userCreate,
+       success:true
    })
 }
 
 } catch (error) {
-    console.log("error in user registration",error)
+    console.log("error in user registration",error.message)
     return    res.status(400).json({
         msg:"user not registered",
-        error 
+        error:error.message
     }) 
 } 
 }
@@ -162,6 +163,7 @@ return res.status(200)
     data:{
         user,accessToken,refreshToken  // we are sending tokens explisitly because if user want to store token in local storage
     },
+    success:true
 }) 
 } catch (error) {
    console.log("Login failed",error)
@@ -195,7 +197,8 @@ export const userLogout= async function(req,res){
       .clearCookie("accessToken", options)
       .clearCookie("refreshToken",options)
       .json({
-        msg:"user logout successfully"
+        msg:"user logout successfully",
+        success:true
       })
 
    } catch (error) {
@@ -231,6 +234,7 @@ export const changePassword=async function (req,res){
    
       return res.status(200).json({
                  msg:"password updation  successful",
+                 success:true
                  
              })
 
@@ -246,8 +250,9 @@ export const changePassword=async function (req,res){
 export const getCurrentUser= async function(req,res){
     try {
         res.status(200).json({
-            user:req.user,
-            msg:"user fetching successfull"
+            data:req.user,
+            msg:"user fetching successfull",
+            success:true
         })
     } catch (error) {
         return res.status(500).json({
@@ -288,6 +293,7 @@ export const userDetailsUpdate= async function(req,res){
 
         return res.status(200).json({
             msg:"user datails updated successfully",
+            success:true,
         })
 
     } catch (error) {
@@ -337,6 +343,7 @@ export const updateAvatar= async function(req,res){
 
 return res.status(200).json({
     msg:"avatar updated successfully",
+    success:true
 })
     } catch (error) {
         return res.status(500).json({
