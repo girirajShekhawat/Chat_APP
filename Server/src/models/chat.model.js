@@ -22,9 +22,9 @@ groupAdmin:{
     ref:"User"
 }
 },
-{timestamps:true
-}
-)
+{
+    timestamps:true
+})
 
 const Chat=mongoose.model("Chat",chatSchema);
 
