@@ -353,6 +353,39 @@ return res.status(200).json({
     }
 }
 
+//search for the users 
+
+export const searchUser=async function(req,res){
+  try {
+      const keyword=req.query.search ?
+      {$or:[
+        {name:{$regex:req.query.search,$options:"i"}},
+        {email:{$regex:req.query.search,$options:"i"}},
+        {username:{$regex:req.query.search,$options:"i"}},
+        
+      ]} : {}
+  
+      const search=await User.find(keyword).find({_id:{$ne:req.user._id}})
+      
+      if(!search){
+          res.status(404).json({
+              msg:"searching got failed"
+          })
+      }
+      
+      res.status(200).json({
+          msg:"searching is successfull",
+          users:search
+      })
+  
+  } catch (error) {
+    return res.status(500).json({
+        msg:"some thing went wrong in searching the user",
+        error:error.message
+    })
+  }
+}
+
 
  
 
