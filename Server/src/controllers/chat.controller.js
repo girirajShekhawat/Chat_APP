@@ -85,7 +85,7 @@ const fetchAllChats= async function(req,res){
                 msg:"Error in fetching the chats",
               })
              }    
-             
+
              res.status(200).json({
               msg:"all chats are fetched successfully",
               chat
@@ -99,9 +99,179 @@ const fetchAllChats= async function(req,res){
 }
 
 
+// create group chat 
+
+const createGroupChat= async function(req,res){
+  try {
+    if((!req.body.user)||(!req.body.name)){
+    res.status(400).json({
+       msg:"group name or users both should be present"
+      })
+    }
+
+    let groupMembers=req.body.user
+    groupMembers.push(req.user)
+
+    if(groupMembers.length<3){
+      res.status(400).json({
+        msg:"group member should be more than 2"
+      })
+    }
+
+    const group=await Chat.create({
+      chatName:req.body.name,
+      users:groupMembers,
+      isGroupChat:true,
+      groupAdmin:req.user
+    })
+   const accessTheGroup= await Chat.findById({_id:group._id})
+                                   .populate("users", "-password")
+                                   .populate("groupAdmin","-password")
+     
+     res.status(200).json({
+      msg: "new group formation is successfully",
+      group:accessTheGroup
+     })
+ 
+
+  } catch (error) {
+    console.log("error in making the group",error.message)
+    res.status(500).json({
+      msg:error.message
+    })
+  }
+}
+
+
+//Rename the group 
+
+const renameGroup=async function(req,res){
+  try {
+    const {chatId,chatName}=req.body;
+
+    if(!chatId || !chatName){
+    req.status(400).json({
+      msg:"chatId or chatName is required"
+    })
+    }
+
+    const updatedName= await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        chatName:chatName,
+      },
+       {
+        new:true
+       }
+    ).populate("users","-password")
+     .populate("groupAdmin","-password")
+
+    if(!updatedName){
+      res.status(400).json({
+        msg:"updating the name is failed"
+      })
+    }
+
+    res.status(200).json({
+      msg:"name updation successfull"
+    })
+
+  } catch (error) {
+    console.log("Error is from the groupRename controller", error.message);
+    res.status(500).json({
+      msg:error.message
+    })
+  }
+}
+
+//Removing the user from the group
+
+const removeTheUser= async function(req,res){
+   
+ try {
+   const {userId,chatId}=req.body
+ 
+   if(!userId || !chatId){
+     res.status(404).json({
+       msg:"userId or chatId is not present"
+     })
+   }
+ 
+   const removeUser= await Chat.findByIdAndUpdate(
+        chatId,
+        {
+         $pull:{users:userId}
+        },
+        {
+         new:true
+        }
+   ).populate("users","-password")
+    .populate("groupAdmin","-password")
+   if(!removeUser){
+     res.status(404).json({
+       msg:"user remove failed"
+     })
+   }
+   
+   res.status(200).json({
+     msg:"user is removed successfully",
+     chat:removeUser
+   })
+ 
+ } catch (error) {
+  console.log("Error is from the  removing the user controller", error.message);
+  res.status(500).json({
+    msg:error.message
+  })
+ }
+}
+
+//Adding the new user in the group
+
+const addingTheUser=async function(req,res){
+ try {
+   const {chatId,userId}=req.body
+ 
+   if(!chatId || !userId){
+     res.status(400).json({
+       msg:"chatId or userId is not present"
+     })
+   }
+   
+   const addUser=await Chat.findByIdAndUpdate(
+     chatId,
+     {
+       $push:{users:userId}
+     },
+     {
+       new:true
+     }
+   ).populate("users","-password")
+    .populate("groupAdmin","-password")
+ 
+    if(!addUser){
+     res.status(404).json({
+       msg:"adding the user is failed"
+     })
+    }
+ 
+    res.status(200).json({
+     msg:"user is added in the group successfully",
+     chat:addUser
+    })
+ } catch (error) {
+  console.log("Error is from the  adding the user controller", error.message);
+  res.status(500).json({
+    msg:error.message
+  })
+ }
+}
 
 export {
     assessChat,
     fetchAllChats,
-
+    createGroupChat,
+    renameGroup,
+    removeTheUser,
+    addingTheUser,
 }
