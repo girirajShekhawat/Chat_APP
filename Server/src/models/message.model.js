@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 
 const messageSchema= new mongoose.Schema({
-Content:{
+content:{
     type:String,
     required:true,
 },
