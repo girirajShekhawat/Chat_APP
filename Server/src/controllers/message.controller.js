@@ -43,7 +43,10 @@ const createMessage=async function(req,res){
     
        res.status(200).json({
         msg:"message sended successfully",
-        message
+        data:{
+            message
+          },
+        success:true
        })
     } catch (error) {
         console.log("this error is coming from the message model",error.message)
@@ -76,6 +79,15 @@ const fetchMessage= async function(req,res){
           msg:"message fetching is failed"
       })
     }
+
+    res.status(200).json({
+        msg:"message fetching successfully",
+        success:true,
+        data:{
+            message
+          },
+        
+    })
   } catch (error) {
     res.status(500).json({
         msg:error.message

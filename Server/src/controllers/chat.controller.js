@@ -49,7 +49,11 @@ const assessChat= async function(req,res){
     if(chat){
         res.status(200).json({
             msg:"new chat is created with this user",
-            chat
+            success:true,
+            data:{
+              chat
+            },
+             
         })
     }
     
@@ -88,7 +92,10 @@ const fetchAllChats= async function(req,res){
 
              res.status(200).json({
               msg:"all chats are fetched successfully",
-              chat
+              data:{
+                chat
+              },
+              success:true
             })
   } catch (error) {
     console.log("error is from the fetch all the chats controller",error.message);
@@ -130,7 +137,10 @@ const createGroupChat= async function(req,res){
      
      res.status(200).json({
       msg: "new group formation is successfully",
-      group:accessTheGroup
+      data:{
+        group:accessTheGroup,
+      },
+      success:true
      })
  
 
@@ -173,7 +183,8 @@ const renameGroup=async function(req,res){
     }
 
     res.status(200).json({
-      msg:"name updation successfull"
+      msg:"name updation successfull",
+      success:true,
     })
 
   } catch (error) {
@@ -215,7 +226,10 @@ const removeTheUser= async function(req,res){
    
    res.status(200).json({
      msg:"user is removed successfully",
-     chat:removeUser
+     data:{
+      chat:removeUser,
+    },
+     success:true
    })
  
  } catch (error) {
@@ -257,7 +271,10 @@ const addingTheUser=async function(req,res){
  
     res.status(200).json({
      msg:"user is added in the group successfully",
-     chat:addUser
+     data:{
+      chat:addUser,
+    },
+     success:true
     })
  } catch (error) {
   console.log("Error is from the  adding the user controller", error.message);

@@ -108,7 +108,6 @@ if(userCreate){
 
 
 //  for login controller
-
 export const userLogin= async function(req,res){
 
 try {
@@ -365,7 +364,7 @@ export const searchUser=async function(req,res){
         
       ]} : {}
   
-      const search=await User.find(keyword).find({_id:{$ne:req.user._id}})
+      const search=await User.find(keyword).find({_id:{$ne:req.user._id}}).select("-password")
       
       if(!search){
           res.status(404).json({
@@ -375,7 +374,10 @@ export const searchUser=async function(req,res){
       
       res.status(200).json({
           msg:"searching is successfull",
-          users:search
+          data:{
+            users:search,
+          },
+          success:true
       })
   
   } catch (error) {
