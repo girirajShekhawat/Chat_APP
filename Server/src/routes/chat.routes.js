@@ -1,6 +1,6 @@
 import { Router } from "express";
-import {  assessChat, fetchAllChats,createGroupChat,renameGroup,removeTheUser,addingTheUser, } from "../controllers/chat.controller";
-import { verifyJwt } from "../middleware/auth.middleware";
+import {  assessChat, fetchAllChats,createGroupChat,renameGroup,removeTheUser,addingTheUser, } from "../controllers/chat.controller.js";
+import { verifyJwt } from "../middleware/auth.middleware.js";
 const chatRouter=Router();
 
 

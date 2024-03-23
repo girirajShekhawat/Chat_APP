@@ -81,7 +81,7 @@ try {
        name,
        email,
        password,
-       avatar:avatarUrl || "",
+       avatar:avatarUrl || "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
        }
 
 const userCreate= await User.create(user);    

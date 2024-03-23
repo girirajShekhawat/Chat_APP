@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import Chat from "../models/chat.model";
-import User from "../models/user.model";
+import Chat from "../models/chat.model.js";
+import User from "../models/user.model.js";
 
 
 // accessing the one to one chat of the user if it is not present there then create a new chat  

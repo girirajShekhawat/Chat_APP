@@ -1,6 +1,6 @@
-import Message from "../models/message.model";
-import User from "../models/user.model";
-import Chat from "../models/chat.model";
+import Message from "../models/message.model.js";
+import User from "../models/user.model.js";
+import Chat from "../models/chat.model.js";
 
 
 //create the new massage;
