@@ -7,7 +7,7 @@ import User from "../models/user.model.js";
 
 const assessChat= async function(req,res){
   try {
-    
+     
     const {userId}=req.body;
 
     if(!userId){
@@ -17,36 +17,46 @@ const assessChat= async function(req,res){
   })
     }
 
+    // this is finding the chat if it is present already
     let isChat =await Chat.find({
         isGroupChat:false,
         $and:[
             {users:{$elemMatch: {$eq:req.user._id}}},
             {users:{$elemMatch:{$eq:userId}}}
         ]
-    }).populate("users","-password")
-     .populate("latestMessage");
+    })
+     .populate("users","-password -refreshToken")
+      .populate("latestMessage");
 
-     isChat=await User.populate("isChat",{
+       
+
+
+     isChat=await Chat.populate(isChat,{
         path:"latestMessage.sender",
         select:"name email avatar"
      })
 
+     
+
      if(isChat.length>0){
-     res.send(isChat[0])
-     }else{
+     res.send(isChat[0]);
+     return;
+     }
         //creating the new chat 
-        var chatData={
+          const chatData={
            chatName:"Chat",
             isGroupChat:false,
             users:[req.user._id,userId],
         }
-     }
+     
+        
 
      const newChat=await Chat.create(chatData);
      const chat =await Chat.findOne({_id:newChat._id}).populate("users",
        "-password")
-
+       console.log("new chat is from the assecc token", chat )
     if(chat){
+      
         res.status(200).json({
             msg:"new chat is created with this user",
             success:true,
@@ -72,25 +82,25 @@ const assessChat= async function(req,res){
 const fetchAllChats= async function(req,res){
 
   try {
-    const  chat= await Chat.find({users:{$elemMatch:{$eq:req.user._id}}})
-                 .populate("users","-password")
-                 .populate("groupAdmin","-password")
+      
+    let  chat= await Chat.find({users:{$elemMatch:{$eq:req.user._id}}})
+                  .populate("users","-password -refreshToken")
+                  .populate("groupAdmin","-password -refreshToken")
                  .populate("latestMessage")
                  .sort({updatedAt:-1})
-                 .then(async (result)=>{
-                   result=await User.populate(result,{
-                    path:"latestMessage.sender",
-                    select:"name email avatar"
-                   })
-                 })
 
+          chat=await Chat.populate(chat,{
+            path:"latestMessage.sender",
+            select:"name email avatar"
+          })       
+ console.log("heloo after the chats 3", chat)
              if(!chat){
-              res.status(400).json({
+             return res.status(400).json({
                 msg:"Error in fetching the chats",
               })
              }    
 
-             res.status(200).json({
+          return   res.status(200).json({
               msg:"all chats are fetched successfully",
               data:{
                 chat
@@ -107,7 +117,6 @@ const fetchAllChats= async function(req,res){
 
 
 // create group chat 
-
 const createGroupChat= async function(req,res){
   try {
     if((!req.body.user)||(!req.body.name)){
